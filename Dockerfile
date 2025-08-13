@@ -1,9 +1,7 @@
-# Usa una imagen base de Python oficial
 FROM python:3.10-slim
 
-# Instala las dependencias necesarias para Odoo
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
+# Instalar dependencias del sistema necesarias para Odoo
+RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
     libjpeg-dev \
@@ -12,31 +10,32 @@ RUN apt-get update \
     zlib1g-dev \
     libldap2-dev \
     libsasl2-dev \
-    libldap2-dev \
     libssl-dev \
     git \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Crea un usuario y grupo para Odoo
+# Crear usuario para Odoo
 RUN useradd -m -d /opt/odoo -U -s /bin/bash odoo
 
-# Instala wkhtmltopdf para los reportes PDF (opcional, pero recomendado)
-#RUN apt-get update && apt-get install -y wkhtmltopdf
-
-# Establece la variable de entorno para Odoo
-ENV ODOO_CONF=/etc/odoo/odoo.conf
-
-# Establece el directorio de trabajo
+# Establecer directorio de trabajo
 WORKDIR /opt/odoo
 
-# Copia el código de Odoo clonado
+# Copiar código de Odoo clonado en el repo
 COPY ./odoo ./odoo
 
-# Instala las dependencias de Python
-RUN pip install -r ./odoo/requirements.txt
+# Instalar dependencias Python
+RUN pip install --no-cache-dir -r ./odoo/requirements.txt
 
-# Configura el usuario
+# Crear carpeta para configuración
+RUN mkdir /etc/odoo && chown odoo /etc/odoo
+
+# Copiar odoo.conf si lo tienes en tu repo (opcional)
+# COPY ./odoo.conf /etc/odoo/odoo.conf
+COPY ./odoo.conf /etc/odoo/odoo.conf
+
+# Cambiar al usuario odoo
 USER odoo
 
-# Comando por defecto para iniciar Odoo
-CMD ["python3", "./odoo/odoo-bin"]
+# Comando de inicio
+CMD ["python3", "./odoo/odoo-bin", "--config=/etc/odoo/odoo.conf"]
