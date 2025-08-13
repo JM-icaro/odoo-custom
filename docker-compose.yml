@@ -3,9 +3,9 @@ services:
     image: postgres:15-alpine
     container_name: odoo_db
     environment:
-      POSTGRES_DB: arami_odoo_database
-      POSTGRES_USER: arami_bd_user
-      POSTGRES_PASSWORD: Joma-Ciruta-1-fd9c36af
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - db_data:/var/lib/postgresql/data
 
@@ -15,12 +15,16 @@ services:
     depends_on:
       - db
     ports:
-      - "8069:8069"
+      - "${ODOO_PORT}:8069"
     environment:
-      HOST: db
-      USER: arami_bd_user
-      PASSWORD: Joma-Ciruta-1-fd9c36af
-      DB_NAME: arami_odoo_database
+      DB_NAME: ${DB_NAME}
+      USER: ${DB_USER}
+      PASSWORD: ${DB_PASSWORD}
+      HOST: ${DB_HOST}
+      PORT: ${DB_PORT}
+      PGUSER: ${PGUSER}
+      PGPASSWORD: ${PGPASSWORD}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
     volumes:
       - ./odoo/addons:/opt/odoo/odoo/addons
       - ./odoo/odoo:/opt/odoo/odoo
@@ -29,3 +33,4 @@ services:
 volumes:
   db_data:
   odoo_data:
+
