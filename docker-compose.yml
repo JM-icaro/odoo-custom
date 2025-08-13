@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  odoo:
+    build: . # Construye la imagen usando el Dockerfile en la misma carpeta
+    container_name: odoo_app
+    ports:
+      - "8069:8069" # Odoo estará accesible en http://localhost:8069
+    volumes:
+      - ./odoo/addons:/usr/lib/python3/dist-packages/odoo/addons # Monta tus addons locales
+      - ./odoo/odoo:/usr/lib/python3/dist-packages/odoo/odoo # Monta tu código Odoo
+      - odoo_data:/var/lib/odoo # Volumen para los archivos de Odoo
+    depends_on:
+      - db # Asegura que la base de datos se inicie primero
+    environment:
+      - PASSWORD=password_secret_db # Clave de la base de datos
+      - HOST=db # Nombre del servicio de la base de datos
+      - USER=arami_bd_user # Usuario de la base de datos
+      - DB_NAME=arami_odoo_database # Nombre de la base de datos
+      - PGUSER=arami_bd_user
+      - PGPASSWORD=Joma-Ciruta-1-fd9c36af
+      - PGHOST=db
+
+  db:
+    image: postgres:15-alpine # Usa una imagen oficial de PostgreSQL
+    container_name: odoo_db
+    environment:
+      - POSTGRES_DB=arami_odoo_database
+      - POSTGRES_USER=arami_bd_user
+      - POSTGRES_PASSWORD=Joma-Ciruta-1-fd9c36af
+    volumes:
+      - db_data:/var/lib/postgresql/data # Volumen para mantener los datos de la base de datos
+
+volumes:
+  odoo_data:
+  db_data:
