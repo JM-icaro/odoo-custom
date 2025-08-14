@@ -1,7 +1,6 @@
 services:
   db:
     image: postgres:15-alpine
-    container_name: odoo_db
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -11,11 +10,8 @@ services:
 
   odoo:
     build: .
-    container_name: odoo_app
     depends_on:
       - db
-    ports:
-      - "${ODOO_PORT}:8069"
     environment:
       DB_NAME: ${DB_NAME}
       USER: ${DB_USER}
