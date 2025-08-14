@@ -38,4 +38,4 @@ COPY ./odoo.conf /etc/odoo/odoo.conf
 USER odoo
 
 # Comando de inicio
-CMD ["python3", "./odoo/odoo-bin", "--config=/etc/odoo/odoo.conf"]
+CMD ["python3", "./odoo/odoo-bin", "--db_host=db", "--db_user=arami_bd_user", "--db_password=Joma-Ciruta-1-fd9c36af", "--addons-path=/opt/odoo/odoo/addons", "--log-level=info"]
