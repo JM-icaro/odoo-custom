@@ -1,6 +1,6 @@
-FROM python:3.10-slim
+FROM python:3.11-slim
 
-# Instalar dependencias del sistema necesarias para Odoo
+# Instala todas las dependencias del sistema necesarias para Odoo 18.0
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
@@ -13,29 +13,34 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libssl-dev \
     git \
     curl \
+    libffi-dev \
+    libwebp-dev \
+    libharfbuzz-dev \
+    libfribidi-dev \
+    libegl1 \
+    python3-dev \
+    libtiff5-dev \
+    xz-utils \
     && rm -rf /var/lib/apt/lists/*
 
-# Crear usuario para Odoo
+# Crea el usuario odoo
 RUN useradd -m -d /opt/odoo -U -s /bin/bash odoo
 
-# Establecer directorio de trabajo
+# Define la carpeta de trabajo
 WORKDIR /opt/odoo
 
-# Copiar código de Odoo clonado en el repo
+# Copia tu código de Odoo completo (core + addons)
 COPY ./odoo ./odoo
 
-# Instalar dependencias Python
-RUN pip install --no-cache-dir -r ./odoo/requirements.txt
+# Instala pip y dependencias Python según tu requirements.txt
+RUN pip install --upgrade pip setuptools wheel \
+    && pip install --no-cache-dir -r ./odoo/requirements.txt
 
-# Crear carpeta para configuración
-RUN mkdir /etc/odoo && chown odoo /etc/odoo
-
-# Copiar odoo.conf si lo tienes en tu repo (opcional)
-# COPY ./odoo.conf /etc/odoo/odoo.conf
+# Copia configuración si aplica
 COPY ./odoo.conf /etc/odoo/odoo.conf
 
-# Cambiar al usuario odoo
+# Cambia al usuario odoo
 USER odoo
 
 # Comando de inicio
-CMD ["python3", "./odoo/odoo-bin", "--db_host=db", "--db_user=arami_bd_user", "--db_password=Joma-Ciruta-1-fd9c36af", "--addons-path=/opt/odoo/odoo/addons", "--log-level=info"]
+CMD ["python3", "./odoo/odoo-bin", "--config=/etc/odoo/odoo.conf"]
